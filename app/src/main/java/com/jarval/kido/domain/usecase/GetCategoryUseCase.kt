@@ -1,12 +1,15 @@
 package com.jarval.kido.domain.usecase
 
+import com.jarval.kido.domain.model.feature.dashboard.CategoryItem
 import com.jarval.kido.domain.repository.CategoryRepository
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 class GetCategoryUseCase @Inject constructor(
-    private val categoryRepository: CategoryRepository
-){
+    val categoryRepository: CategoryRepository
+) {
 
-    suspend operator fun invoke() = categoryRepository.getCategories()
+    suspend operator fun invoke(): List<CategoryItem> {
+        return categoryRepository.getCategories()
+    }
 
 }

@@ -1,10 +1,9 @@
-package com.jarval.kido.presentation.feature.dashboard
+package com.jarval.kido.presentation.feature.category
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jarval.kido.domain.usecase.GetCategoryPreviewUseCase
+import com.jarval.kido.domain.usecase.GetCategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -12,26 +11,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DashboardViewModel @Inject constructor(
-    private val getCategoriesUseCase: GetCategoryPreviewUseCase,
-) : ViewModel(){
+class CategoryViewModel @Inject constructor(
+    private val getCategoriesUseCase: GetCategoryUseCase
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(DashboardUiState())
-    val state: StateFlow<DashboardUiState> = _state
-
-    private val _effects = MutableSharedFlow<DashboardUiEffect>()
-    val effects: MutableSharedFlow<DashboardUiEffect> = _effects
-
+    private val _state = MutableStateFlow(CategoryUiState())
+    val state: StateFlow<CategoryUiState> = _state
 
     init {
         loadCategories()
-    }
-
-    fun process(intent: DashboarUidIntent){
-        when(intent){
-            DashboarUidIntent.OpenCategories -> openCategories()
-            else -> {}
-        }
     }
 
     fun loadCategories(){
@@ -39,16 +27,17 @@ class DashboardViewModel @Inject constructor(
             viewModelScope.launch {
                 _state.update {
                     it.copy(
-                        isLoading = true
+                        isLoading = true,
+                        categories = emptyList(),
+                        errorMessage = null
                     )
                 }
-
                 val categories = getCategoriesUseCase()
-
                 _state.update {
                     it.copy(
+                        isLoading = false,
                         categories = categories,
-                        isLoading = false
+                        errorMessage = null
                     )
                 }
             }
@@ -56,16 +45,10 @@ class DashboardViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     isLoading = false,
+                    categories = emptyList(),
                     errorMessage = e.message
                 )
             }
         }
     }
-
-    private fun openCategories(){
-        viewModelScope.launch {
-            _effects.emit(DashboardUiEffect.NavigateToCategory)
-        }
-    }
-
 }

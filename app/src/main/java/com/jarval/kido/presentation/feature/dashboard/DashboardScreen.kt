@@ -29,21 +29,37 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.jarval.kido.domain.model.feature.dashboard.CategoryItem
 import com.jarval.kido.domain.model.feature.dashboard.PopularItem
 import com.jarval.kido.presentation.components.SectionHeader
+import com.jarval.kido.presentation.navigation.Routes
 
 @Composable
 fun DashboardScreen(
     modifier: Modifier = Modifier,
-    viewModel: DashboardViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel(),
+    navController: NavController
 ) {
 
     val state = viewModel.state.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                is DashboardUiEffect.NavigateToCategory -> {
+                    navController.navigate(Routes.CATEGORY)
+                }
+
+                else -> {}
+            }
+
+        }
+    }
+
     when {
         state.value.isLoading -> {
-            CircularProgressIndicator()
+            CircularProgressIndicator(modifier)
         }
 
         state.value.errorMessage != null -> {
@@ -54,8 +70,12 @@ fun DashboardScreen(
             Column(modifier = modifier) {
                 Greeting(modifier = modifier)
                 OfferCard(modifier = modifier)
-                Categories(modifier = modifier,
-                    categoryItems = state.value.categories
+                Categories(
+                    modifier = modifier,
+                    categoryItems = state.value.categories,
+                    onHeaderActionClick = {
+                        viewModel.process(DashboarUidIntent.OpenCategories)
+                    }
                 )
                 PopularProducts(modifier = modifier)
             }
@@ -130,12 +150,14 @@ fun OfferCard(modifier: Modifier = Modifier) {
 @Composable
 fun Categories(
     modifier: Modifier = Modifier,
-    categoryItems: List<CategoryItem>
+    categoryItems: List<CategoryItem>,
+    onHeaderActionClick: () -> Unit
 ) {
     Column() {
         SectionHeader(
             title = "Categories",
-            actionLabel = "See all"
+            actionLabel = "See all",
+            onClick = onHeaderActionClick
         )
         CategoriesGrid(categoryItems)
     }
@@ -166,8 +188,8 @@ fun CategoriesItemCard(
     title: String,
     subtitle: String
 ) {
-    Card() {
-        Column() {
+    Card {
+        Column(modifier = Modifier.padding(4.dp)) {
             Icon(
                 imageVector = iconResource,
                 contentDescription = ""
@@ -186,7 +208,8 @@ fun PopularProducts(modifier: Modifier = Modifier) {
     )
     SectionHeader(
         title = "Popular Products",
-        actionLabel = "See all"
+        actionLabel = "See all",
+        onClick = {}
     )
 
     LazyRow(

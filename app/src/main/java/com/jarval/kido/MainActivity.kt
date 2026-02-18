@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.jarval.kido.presentation.feature.dashboard.DashboardScreen
+import com.jarval.kido.presentation.navigation.KidoNavigation
 import com.jarval.kido.ui.theme.KidoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,17 +23,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             KidoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    DashboardScreen(Modifier.padding(innerPadding))
+                    KidoNavigation(Modifier.padding(innerPadding))
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    KidoTheme {
-        DashboardScreen()
-    }
-}

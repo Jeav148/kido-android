@@ -11,9 +11,15 @@ class CategoryRepositoryImpl @Inject constructor(
     private val categoryMapper: CategoryMapper
 ) : CategoryRepository {
 
-    override suspend fun getCategories(): List<CategoryItem> {
+    override suspend fun getCategoriesPreview(): List<CategoryItem> {
         delay(1000L)
         return DemoData.categories.subList(0,4)
+        //return kidoApi.getCategories().map { categoryMapper.map(it) }
+    }
+
+    override suspend fun getCategories(): List<CategoryItem> {
+        delay(1000L)
+        return DemoData.categories
         //return kidoApi.getCategories().map { categoryMapper.map(it) }
     }
 }

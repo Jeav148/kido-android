@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 fun SectionHeader(
     title: String,
     actionLabel: String,
+    onClick: () -> Unit
 ){
     Row(modifier = Modifier
         .fillMaxWidth(),
@@ -24,7 +25,7 @@ fun SectionHeader(
         verticalAlignment = Alignment.CenterVertically) {
         Text(text = title)
         TextButton(
-            onClick = {},
+            onClick = onClick,
             modifier = Modifier
         ) {
             Text(
