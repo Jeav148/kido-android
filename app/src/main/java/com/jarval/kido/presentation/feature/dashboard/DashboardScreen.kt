@@ -1,6 +1,5 @@
 package com.jarval.kido.presentation.feature.dashboard
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,27 +18,56 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jarval.kido.domain.model.feature.dashboard.CategoryItem
 import com.jarval.kido.domain.model.feature.dashboard.PopularItem
 import com.jarval.kido.presentation.components.SectionHeader
 
 @Composable
-fun DashboardScreen(modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        Greeting(modifier = modifier)
-        OfferCard(modifier = modifier)
-        Categories(modifier = modifier)
-        PopularProducts(modifier = modifier)
+fun DashboardScreen(
+    modifier: Modifier = Modifier,
+    viewModel: DashboardViewModel = hiltViewModel()
+) {
+
+    val state = viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.processIntent(DashboardIntent.LoadCategories)
     }
+
+    when {
+        state.value.isLoading -> {
+            CircularProgressIndicator()
+        }
+
+        state.value.errorMessage != null -> {
+            Text("An error occurred: ${state.value.errorMessage}")
+        }
+
+        else -> {
+            Column(modifier = modifier) {
+                Greeting(modifier = modifier)
+                OfferCard(modifier = modifier)
+                Categories(modifier = modifier,
+                    categoryItems = state.value.categories
+                )
+                PopularProducts(modifier = modifier)
+            }
+        }
+    }
+
+
 }
 
 @Composable
@@ -105,14 +133,10 @@ fun OfferCard(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Categories(modifier: Modifier = Modifier) {
-    val categoryItems = listOf(
-        CategoryItem(Icons.Default.Build, "Baby Diapers", "12 products"),
-        CategoryItem(Icons.Default.Add, "Makeup Removers", "8 products"),
-        CategoryItem(Icons.Default.Face, "Period Pads", "15 products"),
-        CategoryItem(Icons.Default.ArrowForward, "Lactation Pads", "6 products")
-    )
-
+fun Categories(
+    modifier: Modifier = Modifier,
+    categoryItems: List<CategoryItem>
+) {
     Column() {
         SectionHeader(
             title = "Categories",
@@ -170,8 +194,10 @@ fun PopularProducts(modifier: Modifier = Modifier) {
         actionLabel = "See all"
     )
 
-    LazyRow (
-        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+    LazyRow(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(space = 16.dp)
     ) {
         items(popularProducts.size) { index ->
@@ -196,7 +222,9 @@ fun PopularItemCard(
     Card() {
         Column() {
             Box(
-                modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally),
             ) {
                 Icon(
                     imageVector = Icons.Default.Face,
