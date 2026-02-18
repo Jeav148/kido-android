@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
@@ -41,10 +40,6 @@ fun DashboardScreen(
 ) {
 
     val state = viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.processIntent(DashboardIntent.LoadCategories)
-    }
 
     when {
         state.value.isLoading -> {
@@ -157,7 +152,7 @@ fun CategoriesGrid(categoryItems: List<CategoryItem>) {
         items(categoryItems.size) { item ->
             val category = categoryItems[item]
             CategoriesItemCard(
-                iconResource = category.icon,
+                iconResource = Icons.Default.Face,
                 title = category.title,
                 subtitle = category.subtitle
             )

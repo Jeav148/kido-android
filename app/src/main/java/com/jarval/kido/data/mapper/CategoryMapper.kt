@@ -10,7 +10,7 @@ class CategoryMapper @Inject constructor() {
 
     fun map(data: Category): CategoryItem {
         return CategoryItem(
-            icon = Icons.Default.Edit,
+            icon = data.icon,
             title = data.name,
             subtitle = data.availableAmount
         )

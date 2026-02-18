@@ -18,11 +18,8 @@ class DashboardViewModel @Inject constructor(
     private val _state = MutableStateFlow(DashboardUiState())
     val state: StateFlow<DashboardUiState> = _state
 
-    fun processIntent(intent: DashboardIntent){
-        when(intent){
-            is DashboardIntent.LoadCategories -> loadCategories()
-            else -> {}
-        }
+    init {
+        loadCategories()
     }
 
     fun loadCategories(){
