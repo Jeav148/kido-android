@@ -1,6 +1,7 @@
 package com.jarval.kido.presentation.feature.dashboard
 
-import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.jarval.kido.domain.usecase.GetCategoryPreviewUseCase
 import com.jarval.kido.domain.usecase.GetPopularProductUseCase
@@ -42,7 +43,7 @@ class DashboardViewModel @Inject constructor(
                 val categories = getCategoriesUseCase()
                 reduce {
                     copy(
-                        categories = categories,
+                        categories = categories.toMutableList(),
                         isLoading = false
                     )
                 }
@@ -62,7 +63,7 @@ class DashboardViewModel @Inject constructor(
         try {
             reduce {
                 copy(
-                    popularProducts = emptyList(),
+                    popularProducts = mutableStateListOf(),
                     isLoading = true
                 )
             }
@@ -70,7 +71,7 @@ class DashboardViewModel @Inject constructor(
                 val popularProducts = getPopularProductUseCase(limit)
                 reduce {
                     copy(
-                        popularProducts = popularProducts,
+                        popularProducts = popularProducts.toMutableStateList(),
                         isLoading = false
                     )
                 }

@@ -28,7 +28,9 @@ fun CategoryScreen(
     ) {
         Text("List of all categories")
         Spacer(modifier = Modifier.height(8.dp))
-        CategoriesGrid(state.value.categories)
+        CategoriesGrid(
+            categoryItems = state.value.categories
+        )
     }
 }
 

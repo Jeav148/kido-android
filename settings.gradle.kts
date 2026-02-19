@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "kido"
 include(":app")
+include(":core")

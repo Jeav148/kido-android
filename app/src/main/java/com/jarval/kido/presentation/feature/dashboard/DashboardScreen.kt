@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
@@ -23,7 +24,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,6 +58,7 @@ fun DashboardScreen(
                 is DashboardUiEffect.NavigateToCategory -> {
                     navController.navigate(Routes.CATEGORY)
                 }
+
                 is DashboardUiEffect.ShowError -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                 }
@@ -79,14 +85,13 @@ fun DashboardScreen(
                     categoryItems = state.value.categories,
                     onHeaderActionClick = {
                         viewModel.processIntent(DashboardUiIntent.OpenCategories)
-                    }
+                    },
+                    //onActionClick = viewModel::processIntent
                 )
                 PopularProducts(modifier = modifier)
             }
         }
     }
-
-
 }
 
 @Composable
@@ -155,7 +160,7 @@ fun OfferCard(modifier: Modifier = Modifier) {
 fun Categories(
     modifier: Modifier = Modifier,
     categoryItems: List<CategoryItem>,
-    onHeaderActionClick: () -> Unit
+    onHeaderActionClick: () -> Unit,
 ) {
     Column() {
         SectionHeader(
@@ -163,12 +168,16 @@ fun Categories(
             actionLabel = "See all",
             onClick = onHeaderActionClick
         )
-        CategoriesGrid(categoryItems)
+        CategoriesGrid(
+            categoryItems = categoryItems
+        )
     }
 }
 
 @Composable
-fun CategoriesGrid(categoryItems: List<CategoryItem>) {
+fun CategoriesGrid(
+    categoryItems: List<CategoryItem>
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.padding(16.dp),
