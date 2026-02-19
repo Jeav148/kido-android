@@ -22,7 +22,7 @@ object NetworkModule {
     }
 
     @Provides
-    fun provideRetrofitApi(retrofit: Retrofit): KidoApi {
+    fun provideKidoApi(retrofit: Retrofit): KidoApi {
         return retrofit.create(KidoApi::class.java)
     }
 

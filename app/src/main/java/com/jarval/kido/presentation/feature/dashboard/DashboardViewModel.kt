@@ -3,9 +3,13 @@ package com.jarval.kido.presentation.feature.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jarval.kido.domain.usecase.GetCategoryPreviewUseCase
+import com.jarval.kido.domain.usecase.GetPopularProductUseCase
+import com.jarval.kido.presentation.feature.MviViewModel
+import com.jarval.kido.presentation.feature.dashboard.DashboardViewModel.Constants.POPULAR_PRODUCT_LIMIT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -14,57 +18,86 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoryPreviewUseCase,
-) : ViewModel(){
-
-    private val _state = MutableStateFlow(DashboardUiState())
-    val state: StateFlow<DashboardUiState> = _state
-
-    private val _effects = MutableSharedFlow<DashboardUiEffect>()
-    val effects: MutableSharedFlow<DashboardUiEffect> = _effects
-
+    private val getPopularProductUseCase: GetPopularProductUseCase
+) : MviViewModel<DashboardUiIntent, DashboardUiState, DashboardUiEffect>(
+    DashboardUiState()
+) {
+    object Constants {
+        const val POPULAR_PRODUCT_LIMIT = 5
+    }
 
     init {
         loadCategories()
+        loadPopularProducts(POPULAR_PRODUCT_LIMIT)
     }
 
-    fun process(intent: DashboarUidIntent){
-        when(intent){
-            DashboarUidIntent.OpenCategories -> openCategories()
-            else -> {}
-        }
-    }
-
-    fun loadCategories(){
+    fun loadCategories() {
         try {
             viewModelScope.launch {
-                _state.update {
-                    it.copy(
+                reduce {
+                    copy(
                         isLoading = true
                     )
                 }
-
                 val categories = getCategoriesUseCase()
-
-                _state.update {
-                    it.copy(
+                reduce {
+                    copy(
                         categories = categories,
                         isLoading = false
                     )
                 }
             }
         } catch (e: Exception) {
-            _state.update {
-                it.copy(
+            reduce {
+                copy(
                     isLoading = false,
+                    hasError = true,
                     errorMessage = e.message
                 )
             }
         }
     }
 
-    private fun openCategories(){
+    fun loadPopularProducts(limit: Int) {
+        try {
+            reduce {
+                copy(
+                    popularProducts = emptyList(),
+                    isLoading = true
+                )
+            }
+            viewModelScope.launch {
+                val popularProducts = getPopularProductUseCase(limit)
+                reduce {
+                    copy(
+                        popularProducts = popularProducts,
+                        isLoading = false
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            reduce {
+                copy(
+                    isLoading = false,
+                    hasError = true,
+                    errorMessage = e.message
+                )
+            }
+        }
+    }
+
+    private fun openCategories() {
         viewModelScope.launch {
-            _effects.emit(DashboardUiEffect.NavigateToCategory)
+            emitEffect {
+                DashboardUiEffect.NavigateToCategory
+            }
+        }
+    }
+
+    override fun handleIntent(intent: DashboardUiIntent) {
+        when (intent) {
+            DashboardUiIntent.OpenCategories -> openCategories()
+            else -> {}
         }
     }
 

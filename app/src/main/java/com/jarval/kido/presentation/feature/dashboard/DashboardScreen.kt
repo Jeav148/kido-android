@@ -1,5 +1,6 @@
 package com.jarval.kido.presentation.feature.dashboard
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,15 +45,17 @@ fun DashboardScreen(
 ) {
 
     val state = viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.effects.collect { effect ->
+        viewModel.effect.collect { effect ->
             when (effect) {
                 is DashboardUiEffect.NavigateToCategory -> {
                     navController.navigate(Routes.CATEGORY)
                 }
-
-                else -> {}
+                is DashboardUiEffect.ShowError -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
             }
 
         }
@@ -74,7 +78,7 @@ fun DashboardScreen(
                     modifier = modifier,
                     categoryItems = state.value.categories,
                     onHeaderActionClick = {
-                        viewModel.process(DashboarUidIntent.OpenCategories)
+                        viewModel.processIntent(DashboardUiIntent.OpenCategories)
                     }
                 )
                 PopularProducts(modifier = modifier)
