@@ -28,7 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,32 +36,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.jarval.kido.domain.model.feature.dashboard.CategoryItem
 import com.jarval.kido.domain.model.feature.dashboard.ProductItem
 import com.jarval.kido.presentation.components.SectionHeader
-import com.jarval.kido.presentation.navigation.Routes
 
 @Composable
 fun DashboardScreen(
     modifier: Modifier = Modifier,
-    viewModel: DashboardViewModel = hiltViewModel(),
-    navController: NavController
+    viewModel: DashboardViewModel = hiltViewModel()
 ) {
-
     val state = viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is DashboardUiEffect.NavigateToCategory -> {
-                    navController.navigate(Routes.CATEGORY)
-                }
-
                 is DashboardUiEffect.ShowError -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                 }
+
+                else -> {}
             }
 
         }
@@ -75,10 +69,7 @@ fun DashboardScreen(
                 CategoriesState(
                     modifier = modifier,
                     state = state.value,
-                    headerActionClick = {
-                        viewModel.processIntent(DashboardUiIntent.OpenCategories)
-                    }
-                    //onActionClick = viewModel::processIntent
+                    headerActionClick = viewModel::navigateToCategory
                 )
                 PopularProductsState(
                     modifier = modifier,
@@ -155,7 +146,7 @@ fun OfferCard(modifier: Modifier = Modifier) {
 fun CategoriesState(
     modifier: Modifier = Modifier,
     state: DashboardUiState,
-    headerActionClick: () -> Unit
+    headerActionClick: (String) -> Unit
 ) {
     when (state.categoryState) {
         is CategoryState.Loading -> {
@@ -181,7 +172,7 @@ fun CategoriesState(
 fun CategoriesSuccess(
     modifier: Modifier = Modifier,
     categoryItems: List<CategoryItem>,
-    onHeaderActionClick: () -> Unit,
+    onHeaderActionClick: (String) -> Unit,
 ) {
     Column() {
         SectionHeader(

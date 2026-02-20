@@ -19,23 +19,25 @@ import com.jarval.kido.presentation.feature.dashboard.CategoriesGrid
 @Composable
 fun CategoryScreen(
     modifier: Modifier = Modifier,
-    viewModel: CategoryViewModel = hiltViewModel()
+    viewModel: CategoryViewModel = hiltViewModel(),
+    categoryName: String
 ){
     val state = viewModel.state.collectAsStateWithLifecycle()
 
     Column (
-        modifier = Modifier.padding(4.dp)
+        modifier = Modifier.padding(12.dp)
     ) {
         Text("List of all categories")
         Spacer(modifier = Modifier.height(8.dp))
         CategoriesGrid(
             categoryItems = state.value.categories
         )
+        Text(categoryName)
     }
 }
 
 @Preview
 @Composable
 fun CategoryScreenPreview(){
-    CategoryScreen()
+    CategoryScreen(categoryName = "Test")
 }

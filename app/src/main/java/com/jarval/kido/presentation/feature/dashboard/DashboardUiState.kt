@@ -9,8 +9,7 @@ import kotlinx.collections.immutable.ImmutableList
 @Stable
 data class DashboardUiState(
     val categoryState: CategoryState = CategoryState.Loading,
-    val productState: ProductState = ProductState.Loading,
-    val isRefreshing: Boolean = false
+    val productState: ProductState = ProductState.Loading
 )
 
 

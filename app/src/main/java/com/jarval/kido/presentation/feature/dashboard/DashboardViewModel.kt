@@ -1,26 +1,22 @@
 package com.jarval.kido.presentation.feature.dashboard
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.jarval.kido.domain.usecase.GetCategoryPreviewUseCase
 import com.jarval.kido.domain.usecase.GetPopularProductUseCase
 import com.jarval.kido.presentation.feature.MviViewModel
 import com.jarval.kido.presentation.feature.dashboard.DashboardViewModel.Constants.POPULAR_PRODUCT_LIMIT
+import com.jarval.kido.presentation.navigation.NavigationDispatcher
+import com.jarval.kido.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoryPreviewUseCase,
-    private val getPopularProductUseCase: GetPopularProductUseCase
+    private val getPopularProductUseCase: GetPopularProductUseCase,
+    private val navigationDispatcher: NavigationDispatcher
 ) : MviViewModel<DashboardUiIntent, DashboardUiState, DashboardUiEffect>(
     DashboardUiState()
 ) {
@@ -44,8 +40,6 @@ class DashboardViewModel @Inject constructor(
                     }
                 }
             }
-
-            DashboardUiIntent.OpenCategories -> openCategories()
             else -> {}
         }
     }
@@ -105,12 +99,8 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    private fun openCategories() {
-        viewModelScope.launch {
-            emitEffect {
-                DashboardUiEffect.NavigateToCategory
-            }
-        }
+    fun navigateToCategory(categoryName: String) {
+        navigationDispatcher.navigateTo(Screen.Category(categoryName))
     }
 
 }

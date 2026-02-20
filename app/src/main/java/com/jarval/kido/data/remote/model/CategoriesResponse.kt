@@ -1,10 +1,6 @@
 package com.jarval.kido.data.remote.model
 
-data class CategoriesResponse(
-    val categories: List<Category>
-)
-
-data class Category(
+data class CategoryResponse(
     val icon: Int,
     val name: String,
     val availableAmount: String

@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,15 +18,19 @@ import androidx.compose.ui.graphics.Color
 fun SectionHeader(
     title: String,
     actionLabel: String,
-    onClick: () -> Unit
+    onClick: (String) -> Unit
 ){
+    val categoryName : String = rememberSaveable() {
+        "This is the Category Name"
+    }
+
     Row(modifier = Modifier
         .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
         Text(text = title)
         TextButton(
-            onClick = onClick,
+            onClick = { onClick(categoryName) },
             modifier = Modifier
         ) {
             Text(
