@@ -1,7 +1,7 @@
 package com.jarval.kido.domain.usecase
 
 import com.jarval.kido.domain.model.feature.dashboard.CategoryItem
-import com.jarval.kido.domain.repository.CategoryRepository
+import com.jarval.kido.data.repository.CategoryRepository
 import jakarta.inject.Inject
 
 class GetCategoryUseCase @Inject constructor(

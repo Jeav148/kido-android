@@ -2,8 +2,8 @@ package com.jarval.kido.di
 
 import com.jarval.kido.data.repository.ProductRepository
 import com.jarval.kido.data.repository.ProductRepositoryImpl
-import com.jarval.kido.domain.repository.CategoryRepository
-import com.jarval.kido.domain.repository.CategoryRepositoryImpl
+import com.jarval.kido.data.repository.CategoryRepository
+import com.jarval.kido.data.repository.CategoryRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

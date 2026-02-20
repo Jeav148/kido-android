@@ -28,7 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -155,7 +154,6 @@ fun CategoriesState(
 
         is CategoryState.Success -> {
             CategoriesSuccess(
-                modifier = modifier,
                 categoryItems = state.categoryState.categories,
                 onHeaderActionClick = headerActionClick
             )
@@ -170,7 +168,6 @@ fun CategoriesState(
 
 @Composable
 fun CategoriesSuccess(
-    modifier: Modifier = Modifier,
     categoryItems: List<CategoryItem>,
     onHeaderActionClick: (String) -> Unit,
 ) {
@@ -237,7 +234,6 @@ fun PopularProductsState(
 
         is ProductState.Success -> {
             PopularProductsSuccess(
-                modifier = modifier,
                 popularProducts = state.productState.products
             )
         }
@@ -249,7 +245,7 @@ fun PopularProductsState(
 }
 
 @Composable
-fun PopularProductsSuccess(modifier: Modifier = Modifier, popularProducts: List<ProductItem>) {
+fun PopularProductsSuccess(popularProducts: List<ProductItem>) {
     val lazyListState = rememberLazyListState()
     val limit = 5
     val showButton by remember {

@@ -1,4 +1,4 @@
-package com.jarval.kido.domain.repository
+package com.jarval.kido.data.repository
 
 import com.jarval.kido.domain.model.feature.dashboard.CategoryItem
 
