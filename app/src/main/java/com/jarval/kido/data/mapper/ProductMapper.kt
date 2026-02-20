@@ -8,9 +8,11 @@ class ProductMapper @Inject constructor() {
 
     fun mapper(product: ProductResponse): ProductItem {
         return ProductItem(
+            id = product.id,
             title = product.name,
             amount = product.inventoryAmount,
-            price = product.price
+            price = product.price,
+            favorite = product.favorite
         )
     }
 }

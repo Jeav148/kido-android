@@ -24,9 +24,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -38,7 +38,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.jarval.kido.domain.model.feature.dashboard.CategoryItem
-import com.jarval.kido.domain.model.feature.dashboard.PopularItem
+import com.jarval.kido.domain.model.feature.dashboard.ProductItem
 import com.jarval.kido.presentation.components.SectionHeader
 import com.jarval.kido.presentation.navigation.Routes
 
@@ -68,27 +68,22 @@ fun DashboardScreen(
     }
 
     when {
-        state.value.isLoading -> {
-            CircularProgressIndicator(modifier)
-        }
-
-        state.value.errorMessage != null -> {
-            Text("An error occurred: ${state.value.errorMessage}")
-        }
-
         else -> {
             Column(modifier = modifier) {
                 Greeting(modifier = modifier)
                 OfferCard(modifier = modifier)
-                Categories(
+                CategoriesState(
                     modifier = modifier,
-                    categoryItems = state.value.categories,
-                    onHeaderActionClick = {
+                    state = state.value,
+                    headerActionClick = {
                         viewModel.processIntent(DashboardUiIntent.OpenCategories)
-                    },
+                    }
                     //onActionClick = viewModel::processIntent
                 )
-                PopularProducts(modifier = modifier)
+                PopularProductsState(
+                    modifier = modifier,
+                    state = state.value
+                )
             }
         }
     }
@@ -157,7 +152,33 @@ fun OfferCard(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Categories(
+fun CategoriesState(
+    modifier: Modifier = Modifier,
+    state: DashboardUiState,
+    headerActionClick: () -> Unit
+) {
+    when (state.categoryState) {
+        is CategoryState.Loading -> {
+            CircularProgressIndicator(modifier)
+        }
+
+        is CategoryState.Success -> {
+            CategoriesSuccess(
+                modifier = modifier,
+                categoryItems = state.categoryState.categories,
+                onHeaderActionClick = headerActionClick
+            )
+        }
+
+        is CategoryState.Error -> {
+            Text("An error occurred: ${(state.categoryState).message}")
+        }
+    }
+
+}
+
+@Composable
+fun CategoriesSuccess(
     modifier: Modifier = Modifier,
     categoryItems: List<CategoryItem>,
     onHeaderActionClick: () -> Unit,
@@ -214,11 +235,38 @@ fun CategoriesItemCard(
 }
 
 @Composable
-fun PopularProducts(modifier: Modifier = Modifier) {
-    val popularProducts = listOf(
-        PopularItem("Baby Diapers", "12 products", "$12.50", favorite = true),
-        PopularItem("Bamboo Diapers and Pads", "15 products", "$12.50", favorite = false)
-    )
+fun PopularProductsState(
+    modifier: Modifier = Modifier,
+    state: DashboardUiState
+) {
+    when (state.productState) {
+        is ProductState.Loading -> {
+            CircularProgressIndicator(modifier)
+        }
+
+        is ProductState.Success -> {
+            PopularProductsSuccess(
+                modifier = modifier,
+                popularProducts = state.productState.products
+            )
+        }
+
+        is ProductState.Error -> {
+            Text("An error occurred: ${(state.productState).message}")
+        }
+    }
+}
+
+@Composable
+fun PopularProductsSuccess(modifier: Modifier = Modifier, popularProducts: List<ProductItem>) {
+    val lazyListState = rememberLazyListState()
+    val limit = 5
+    val showButton by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0
+        }
+    }
+
     SectionHeader(
         title = "Popular Products",
         actionLabel = "See all",
@@ -229,13 +277,14 @@ fun PopularProducts(modifier: Modifier = Modifier) {
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(space = 16.dp)
+        horizontalArrangement = Arrangement.spacedBy(space = 16.dp),
+        state = lazyListState
     ) {
-        items(popularProducts.size) { index ->
+        items(count = popularProducts.size, key = { index -> popularProducts[index].id }) { index ->
             val item = popularProducts[index]
             PopularItemCard(
                 title = item.title,
-                description = item.description,
+                description = item.amount,
                 price = item.price,
                 favorite = item.favorite
             )

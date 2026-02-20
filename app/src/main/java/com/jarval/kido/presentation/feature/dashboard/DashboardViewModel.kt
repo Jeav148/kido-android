@@ -8,6 +8,7 @@ import com.jarval.kido.domain.usecase.GetPopularProductUseCase
 import com.jarval.kido.presentation.feature.MviViewModel
 import com.jarval.kido.presentation.feature.dashboard.DashboardViewModel.Constants.POPULAR_PRODUCT_LIMIT
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -28,60 +29,77 @@ class DashboardViewModel @Inject constructor(
     }
 
     init {
-        loadCategories()
-        loadPopularProducts(POPULAR_PRODUCT_LIMIT)
+        handleIntent(DashboardUiIntent.LoadAllData)
+    }
+
+    override fun handleIntent(intent: DashboardUiIntent) {
+        when (intent) {
+            DashboardUiIntent.LoadAllData -> {
+                viewModelScope.launch {
+                    launch {
+                        loadCategories()
+                    }
+                    launch {
+                        loadPopularProducts(POPULAR_PRODUCT_LIMIT)
+                    }
+                }
+            }
+
+            DashboardUiIntent.OpenCategories -> openCategories()
+            else -> {}
+        }
     }
 
     fun loadCategories() {
-        try {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            try {
                 reduce {
-                    copy(
-                        isLoading = true
-                    )
+                    copy(categoryState = CategoryState.Loading)
                 }
                 val categories = getCategoriesUseCase()
                 reduce {
                     copy(
-                        categories = categories.toMutableList(),
-                        isLoading = false
+                        categoryState = CategoryState.Success(
+                            categories.toImmutableList()
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                reduce {
+                    copy(
+                        categoryState = CategoryState.Error(
+                            e.message ?: "Something went wrong"
+                        )
                     )
                 }
             }
-        } catch (e: Exception) {
-            reduce {
-                copy(
-                    isLoading = false,
-                    hasError = true,
-                    errorMessage = e.message
-                )
-            }
         }
+
     }
 
     fun loadPopularProducts(limit: Int) {
         try {
             reduce {
                 copy(
-                    popularProducts = mutableStateListOf(),
-                    isLoading = true
+                    productState = ProductState.Loading
                 )
             }
             viewModelScope.launch {
                 val popularProducts = getPopularProductUseCase(limit)
                 reduce {
                     copy(
-                        popularProducts = popularProducts.toMutableStateList(),
-                        isLoading = false
+                        productState = ProductState.Success(
+                            products = popularProducts.toImmutableList()
+                        )
                     )
                 }
             }
         } catch (e: Exception) {
             reduce {
                 copy(
-                    isLoading = false,
-                    hasError = true,
-                    errorMessage = e.message
+                    categoryState = CategoryState.Error(
+                        e.message ?: "Something went wrong"
+                    )
                 )
             }
         }
@@ -92,13 +110,6 @@ class DashboardViewModel @Inject constructor(
             emitEffect {
                 DashboardUiEffect.NavigateToCategory
             }
-        }
-    }
-
-    override fun handleIntent(intent: DashboardUiIntent) {
-        when (intent) {
-            DashboardUiIntent.OpenCategories -> openCategories()
-            else -> {}
         }
     }
 
