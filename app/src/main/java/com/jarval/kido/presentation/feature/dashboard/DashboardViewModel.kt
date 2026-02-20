@@ -72,13 +72,13 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun loadPopularProducts(limit: Int) {
-        try {
-            reduce {
-                copy(
-                    productState = ProductState.Loading
-                )
-            }
-            viewModelScope.launch {
+        viewModelScope.launch {
+            try {
+                reduce {
+                    copy(
+                        productState = ProductState.Loading
+                    )
+                }
                 val popularProducts = getPopularProductUseCase(limit)
                 reduce {
                     copy(
@@ -87,14 +87,14 @@ class DashboardViewModel @Inject constructor(
                         )
                     )
                 }
-            }
-        } catch (e: Exception) {
-            reduce {
-                copy(
-                    categoryState = CategoryState.Error(
-                        e.message ?: "Something went wrong"
+            } catch (e: Exception) {
+                reduce {
+                    copy(
+                        productState = ProductState.Error(
+                            e.message ?: "Something went wrong"
+                        )
                     )
-                )
+                }
             }
         }
     }
