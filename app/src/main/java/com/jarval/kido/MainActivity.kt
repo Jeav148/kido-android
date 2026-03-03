@@ -4,9 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import com.jarval.kido.presentation.navigation.NavigationDispatcher
 import com.jarval.kido.presentation.navigation.RootNavHost
@@ -26,8 +32,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             KidoTheme {
                 val navController = rememberNavController()
-                Surface (modifier = Modifier.fillMaxSize()) {
+                Scaffold() {
                     RootNavHost(
+                        modifier = Modifier.padding(it),
                         navController = navController,
                         navigationDispatcher = navigationDispatcher
                     )

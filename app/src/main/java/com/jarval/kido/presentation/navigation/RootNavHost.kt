@@ -2,6 +2,7 @@ package com.jarval.kido.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,6 +12,7 @@ import com.jarval.kido.presentation.feature.dashboard.DashboardScreen
 
 @Composable
 fun RootNavHost(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
     navigationDispatcher: NavigationDispatcher
 ){
@@ -25,7 +27,9 @@ fun RootNavHost(
         startDestination = Screen.Dashboard
     ) {
         composable<Screen.Dashboard> {
-            DashboardScreen()
+            DashboardScreen(
+                modifier = modifier
+            )
         }
 
         composable<Screen.Category> { backStackEntry ->

@@ -3,12 +3,15 @@ package com.jarval.kido.presentation.feature.dashboard
 import androidx.lifecycle.viewModelScope
 import com.jarval.kido.domain.usecase.GetCategoryPreviewUseCase
 import com.jarval.kido.domain.usecase.GetPopularProductUseCase
+import com.jarval.kido.domain.usecase.GetProductFromDataBaseUseCase
 import com.jarval.kido.presentation.feature.MviViewModel
 import com.jarval.kido.presentation.feature.dashboard.DashboardViewModel.Constants.POPULAR_PRODUCT_LIMIT
 import com.jarval.kido.presentation.navigation.NavigationDispatcher
 import com.jarval.kido.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,6 +19,7 @@ import javax.inject.Inject
 class DashboardViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoryPreviewUseCase,
     private val getPopularProductUseCase: GetPopularProductUseCase,
+    private val getProductFromDataBaseUseCase: GetProductFromDataBaseUseCase,
     private val navigationDispatcher: NavigationDispatcher
 ) : MviViewModel<DashboardUiIntent, DashboardUiState, DashboardUiEffect>(
     DashboardUiState()
@@ -97,6 +101,17 @@ class DashboardViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun observePopularProducts(){
+        /*viewModelScope.launch {
+            getProductFromDataBaseUseCase()
+                .distinctUntilChanged()
+                .conflate()
+                .collect {
+
+            }
+        }*/
     }
 
     fun navigateToCategory(categoryName: String) {

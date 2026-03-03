@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">kido</string>
+    <string name="shop_now">Shop Now</string>
+    <string name="offer_banner_hero">20% Off Your First Green Bundle</string>
 </resources>
