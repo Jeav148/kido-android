@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">core</string>
+    <string name="product_go_top_button">Go to top</string>
 </resources>

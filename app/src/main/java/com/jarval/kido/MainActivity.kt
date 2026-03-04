@@ -24,7 +24,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var navigationDispatcher: NavigationDispatcher
+    lateinit var navigationDispatcher : NavigationDispatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +32,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             KidoTheme {
                 val navController = rememberNavController()
-                Scaffold() {
+                Scaffold() { padding ->
                     RootNavHost(
-                        modifier = Modifier.padding(it),
+                        modifier = Modifier.padding(padding),
                         navController = navController,
                         navigationDispatcher = navigationDispatcher
                     )
